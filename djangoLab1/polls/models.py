@@ -9,7 +9,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     avatar = models.ImageField(default='default.jpg', upload_to='profile_images')
     bio = models.TextField()
-    # voted = models.BooleanField(default=False)
+    voted = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.username
@@ -36,7 +36,7 @@ class Question(models.Model):
     img = models.ImageField(null=True, default='default.jpg', upload_to="images/question")
     description = models.TextField(max_length=600, null=True)
     description2 = models.TextField(max_length=600, null=True)
-    
+
     def was_published_recently(self):
         return self.pub_date >= datetime.now() - timedelta(days=1)
 

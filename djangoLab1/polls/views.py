@@ -4,9 +4,8 @@ from .forms import RegisterForm, LoginForm, UpdateUserForm, UpdateProfileForm
 from django.contrib import messages
 from django.contrib.auth.views import LoginView, PasswordResetView, PasswordChangeView
 from django.contrib.auth.decorators import login_required
-from .signals import create_profile
 from django.views import generic
-from .models import Question, Choice
+from .models import Question, Choice, Profile
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 
@@ -92,6 +91,7 @@ class ResultsView(generic.DetailView):
 
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
+    print(question.answered)
     try:
         selected_choice = question.choice_set.get(pk=request.POST['choice'])
     except (KeyError, Choice.DoesNotExist):
@@ -99,10 +99,9 @@ def vote(request, question_id):
             'question': question,
             'error_message': 'вы не сделали выбор'
         })
-    else:
-        selected_choice.votes += 1
-        selected_choice.save()
-        return HttpResponseRedirect(reverse('results', args=(question.id,)))
+    selected_choice.votes += 1
+    selected_choice.save()
+    return HttpResponseRedirect(reverse('results', args=(question.id,)))
 
 @login_required
 def profileDelete(request):

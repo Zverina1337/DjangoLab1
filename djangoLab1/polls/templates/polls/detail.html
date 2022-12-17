@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
+{% if question %}
 <div class="d-flex justify-content-center align-items-center">
     <form action="{% url 'vote' question.id %}" method="post">
         {% csrf_token %}
@@ -10,16 +11,21 @@
             <p>Полное описание: {{ question.description2 }}</p>
             {% if error_message %}<p><strong> {{error_message}}</strong></p>{% endif %}
             {% for choice in question.choice_set.all %}
-            <!-- {% if voted %} -->
+            {% if voted %}
                 <h6>Вы уже проголосовали!</h6>
-            <!-- {% else %} -->
+            {% else %}
             <input type="radio" name="choice" id="choice{{forloop.counter}}" value="{{choice.id}}">
             <label for="choice{{forloop.counter}}">{{choice.choice_text}}</label><br>
-            <!-- {% endif %} -->
+            {% endif %}
             {% endfor %}
         </fieldset>
     <br>
     <input type="submit" value="Vote" class="btn btn-success">
     </form>
 </div>
+{% else %}
+<div class="d-flex justify-content-center align-items-center">
+    <h1>Такого вопроса не существует</h1>
+</div>
+{% endif %}
 {% endblock %}

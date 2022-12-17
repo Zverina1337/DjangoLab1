@@ -5,7 +5,7 @@
 
 <div class="d-flex justify-content-center align-items-center">
     {% for question in latest_question_list %}
-    {% if question.pub_date < question.life_time or user.is_superuser %}
+    {% if question.pub_date < question.life_time %}
     <div class="card mb-5">
         <img src="{{ question.img.url }}" alt="..." height="300px">
         <div class="card-body">
