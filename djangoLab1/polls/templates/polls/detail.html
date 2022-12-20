@@ -2,26 +2,32 @@
 {% block content %}
 {% if question %}
 <div class="d-flex justify-content-center align-items-center">
+    {% if user.is_authenticated %}
     <form action="{% url 'vote' question.id %}" method="post">
         {% csrf_token %}
         <fieldset>
             <legend>
                 <h1>{{question.question_text}}</h1>
             </legend>
+            {% if not user.profile.voted %}
             <p>Полное описание: {{ question.description2 }}</p>
             {% if error_message %}<p><strong> {{error_message}}</strong></p>{% endif %}
             {% for choice in question.choice_set.all %}
-            {% if voted %}
-                <h6>Вы уже проголосовали!</h6>
-            {% else %}
             <input type="radio" name="choice" id="choice{{forloop.counter}}" value="{{choice.id}}">
             <label for="choice{{forloop.counter}}">{{choice.choice_text}}</label><br>
-            {% endif %}
             {% endfor %}
+            {% endif %}
         </fieldset>
     <br>
-    <input type="submit" value="Vote" class="btn btn-success">
+    {% if user.profile.voted %}
+        <h3>Вы уже проголосовали!</h3>
+    {% else %}
+        <input type="submit" value="Vote" class="btn btn-success">
+    {% endif %}
     </form>
+    {% else %}
+        <h1>Вы не авторизованы!</h1>
+    {% endif %}
 </div>
 {% else %}
 <div class="d-flex justify-content-center align-items-center">

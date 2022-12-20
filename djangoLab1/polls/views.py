@@ -31,7 +31,6 @@ class RegisterView(View):
 
         if form.is_valid():
             form.save()
-
             username = form.cleaned_data.get('username')
             messages.success(request, f'Account created for {username}')
 
@@ -45,6 +44,7 @@ class MyLoginView(LoginView):
 
     def form_valid(self, form):
         remember_me = form.cleaned_data.get('remember_me')
+        
 
         if not remember_me:
             self.request.session.set_expiry(0)
@@ -54,6 +54,13 @@ class MyLoginView(LoginView):
 
 @login_required
 def profile(request):
+    if request.method == 'GET':
+        if not Profile.objects.filter(user=request.user.id).exists():
+            print('work')
+            profile = Profile()
+            profile.user = request.user
+            profile.save()
+
     if request.method == 'POST':
         user_form = UpdateUserForm(request.POST, instance=request.user)
         profile_form = UpdateProfileForm(request.POST, request.FILES, instance=request.user.profile)
@@ -90,8 +97,11 @@ class ResultsView(generic.DetailView):
 
 
 def vote(request, question_id):
+    print(request.user.id)
+    print(Profile.objects.get(user=request.user.id))
+    profileVoted(Profile.objects.get(user=request.user.id))
+
     question = get_object_or_404(Question, pk=question_id)
-    print(question.answered)
     try:
         selected_choice = question.choice_set.get(pk=request.POST['choice'])
     except (KeyError, Choice.DoesNotExist):
@@ -102,6 +112,12 @@ def vote(request, question_id):
     selected_choice.votes += 1
     selected_choice.save()
     return HttpResponseRedirect(reverse('results', args=(question.id,)))
+
+
+def profileVoted(profile):
+
+    profile.voted = True
+    profile.save()
 
 @login_required
 def profileDelete(request):
